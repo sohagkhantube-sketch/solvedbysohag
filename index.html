@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solved By SOHAG</title>
+<style>
+  :root{
+    --green:#0f7a3d;
+    --green-dark:#0a5a2c;
+    --blue:#1a56db;
+    --navy:#16324f;
+    --bg:#eef2f5;
+    --card-shadow: 0 2px 8px rgba(16,40,30,0.06);
+    --border:#e3e8ec;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--navy);
+  }
+  a{text-decoration:none;color:inherit;}
+
+  /* HEADER */
+  header{
+    background:#fff;
+    border-bottom:3px solid var(--green);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 32px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .brand{
+    font-size:20px;
+    font-weight:800;
+  }
+  .brand .solved{color:var(--green);}
+  .brand .name{color:var(--blue);}
+  nav{
+    display:flex;
+    gap:26px;
+    font-weight:600;
+    color:#3a4a55;
+  }
+  nav a:hover{color:var(--green);}
+  .header-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .search-wrap{display:flex;}
+  .search-wrap input{
+    padding:8px 12px;
+    border:1px solid #cfd8dd;
+    border-right:none;
+    border-radius:6px 0 0 6px;
+    outline:none;
+    background:#f7f9fa;
+    width:150px;
+  }
+  .search-wrap button{
+    background:var(--green);
+    color:#fff;
+    border:none;
+    padding:8px 16px;
+    border-radius:0 6px 6px 0;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .dash-btn{
+    background:linear-gradient(135deg,var(--green-dark),var(--green));
+    color:#fff;
+    border:2px solid var(--blue);
+    padding:9px 20px;
+    border-radius:999px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .dash-btn:hover{filter:brightness(1.08);}
+
+  /* MAIN GRID */
+  main{max-width:1200px;margin:0 auto;padding:36px 24px;min-height:60vh;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+  }
+  @media(max-width:800px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:#fff;
+    border-radius:12px;
+    box-shadow:var(--card-shadow);
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+    border:1px solid var(--border);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(16,40,30,0.10);}
+  .icon-box{
+    width:44px;height:44px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+    flex-shrink:0;
+  }
+  .card-title{font-weight:700;color:var(--navy);font-size:15px;}
+  .empty-note{color:#7a8994;text-align:center;padding:60px 0;}
+
+  /* FOOTER */
+  footer{
+    border-top:3px solid var(--green);
+    background:#fff;
+    padding:22px;
+    text-align:center;
+    color:#6c7a83;
+  }
+  footer b{color:var(--green);}
+
+  /* MODAL BASE */
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,25,20,0.55);
+    display:none;align-items:center;justify-content:center;
+    padding:20px;z-index:1000;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:#fff;border-radius:14px;
+    max-width:480px;width:100%;
+    padding:26px;
+    position:relative;
+    max-height:88vh;overflow-y:auto;
+  }
+  .modal.wide{max-width:900px;}
+  .modal h2{margin-top:0;color:var(--navy);}
+  .close-x{
+    position:absolute;top:14px;right:16px;
+    background:none;border:none;font-size:20px;cursor:pointer;color:#8a97a0;
+  }
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-weight:600;font-size:13px;margin-bottom:5px;color:#3a4a55;}
+  .field input, .field select, .field textarea{
+    width:100%;padding:9px 11px;border:1px solid #d3dade;border-radius:7px;font-size:14px;font-family:inherit;
+    outline:none;
+  }
+  .field textarea{min-height:110px;resize:vertical;font-family:monospace;font-size:13px;}
+  .btn{
+    background:var(--green);color:#fff;border:none;padding:10px 20px;
+    border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn.secondary{background:#eef2f4;color:var(--navy);}
+  .btn.danger{background:#c0392b;}
+  .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
+  .err{color:#c0392b;font-size:13px;margin-top:8px;min-height:16px;}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;}
+  .swatch{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;}
+  .swatch.selected{border-color:var(--navy);}
+
+  .viewer-frame{width:100%;height:65vh;border:1px solid var(--border);border-radius:8px;}
+  .viewer-img{max-width:100%;max-height:65vh;border-radius:8px;display:block;margin:0 auto;}
+
+  /* MOBILE RESPONSIVE */
+  @media(max-width:640px){
+    header{padding:12px 16px;flex-direction:column;align-items:stretch;}
+    .brand{text-align:center;font-size:18px;}
+    nav{justify-content:center;gap:16px;font-size:14px;}
+    .header-right{flex-direction:column;align-items:stretch;}
+    .search-wrap{width:100%;}
+    .search-wrap input{flex:1;width:auto;}
+    .dash-btn{width:100%;}
+    main{padding:20px 14px;}
+    .modal{padding:18px;max-width:100%;}
+    .admin-bar{padding:12px 16px;flex-direction:column;align-items:stretch;text-align:center;}
+    .admin-bar .actions{justify-content:center;}
+    .admin-main{padding:20px 14px;}
+    .settings-card{max-width:100%;}
+    .admin-item{flex-direction:column;align-items:flex-start;}
+    .admin-item .btns{width:100%;justify-content:flex-end;}
+    .viewer-frame{height:55vh;}
+  }
+
+  /* ADMIN */
+  .admin-bar{
+    background:var(--navy);color:#fff;padding:14px 32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  }
+  .admin-bar .title{font-weight:800;font-size:17px;}
+  .admin-bar .actions{display:flex;gap:10px;}
+  .admin-main{max-width:1100px;margin:0 auto;padding:28px 24px;}
+  .section-title{font-weight:800;font-size:16px;margin:26px 0 12px;color:var(--navy);}
+  .admin-list{display:flex;flex-direction:column;gap:10px;}
+  .admin-item{
+    background:#fff;border:1px solid var(--border);border-radius:10px;
+    padding:12px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--card-shadow);
+    flex-wrap:wrap;
+  }
+  .admin-item .meta{flex:1;min-width:160px;}
+  .admin-item .meta .t{font-weight:700;}
+  .admin-item .meta .s{font-size:12px;color:#8a97a0;}
+  .admin-item .btns{display:flex;gap:8px;}
+  .btn.small{padding:6px 12px;font-size:12px;}
+  .settings-card{
+    background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);
+    max-width:420px;
+  }
+  .login-box{max-width:360px;margin:80px auto;background:#fff;border-radius:14px;padding:30px;box-shadow:var(--card-shadow);border:1px solid var(--border);}
+  .hint{font-size:12px;color:#8a97a0;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- Login modal -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeLogin()">✕</button>
+    <h2>My Dashboard লগইন</h2>
+    <div class="field">
+      <label>Username</label>
+      <input id="loginUser" type="text" placeholder="username">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="loginPass" type="password" placeholder="password">
+    </div>
+    <div class="err" id="loginErr"></div>
+    <div class="btn-row">
+      <button class="btn secondary" onclick="closeLogin()">Cancel</button>
+      <button class="btn" onclick="doLogin()">লগইন করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Viewer modal (public click) -->
+<div class="overlay" id="viewerOverlay">
+  <div class="modal wide">
+    <button class="close-x" onclick="closeViewer()">✕</button>
+    <h2 id="viewerTitle"></h2>
+    <div id="viewerBody"></div>
+  </div>
+</div>
+
+<!-- Card edit modal -->
+<div class="overlay" id="cardOverlay">
+  <div class="modal">
+    <button class="close-x" onclick="closeCardModal()">✕</button>
+    <h2 id="cardModalTitle">নতুন অপশন যোগ করুন</h2>
+    <div class="field">
+      <label>টাইটেল (Title)</label>
+      <input id="cf_title" type="text" placeholder="যেমনঃ Video Editing">
+    </div>
+    <div class="field">
+      <label>আইকন (একটি ইমোজি দিন)</label>
+      <input id="cf_icon" type="text" placeholder="🎨" maxlength="4">
+    </div>
+    <div class="field">
+      <label>আইকন ব্যাকগ্রাউন্ড রঙ</label>
+      <div class="swatches" id="cf_swatches"></div>
+    </div>
+    <div class="field">
+      <label>ক্লিক করলে কী ওপেন হবে?</label>
+      <select id="cf_type" onchange="renderContentField()">
+        <option value="link">লিংক (URL)</option>
+        <option value="image">ইমেজ (URL)</option>
+        <option value="html">HTML কোড / টেক্সট</option>
+      </select>
+    </div>
+    <div class="field" id="cf_content_wrap">
+      <label id="cf_content_label">লিংক (URL)</label>
+      <input id="cf_content_input" type="text" placeholder="https://example.com">
+      <textarea id="cf_content_textarea" style="display:none" placeholder="&lt;h1&gt;Hello&lt;/h1&gt;"></textarea>
+    </div>
+    <div class="err" id="cardErr"></div>
+    <div class="btn-row">
+      <button class="btn secondary" onclick="closeCardModal()">Cancel</button>
+      <button class="btn" onclick="saveCard()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SWATCHES = ['#fde3cf','#d9ecff','#e9dcfb','#dbe7ff','#fbdcec','#d7f5e3','#ffe8cc','#dff5e0','#fbe0e0'];
+let DATA = null;
+let editingId = null;
+let isAdmin = false;
+
+const STORAGE_KEY = 'site-data';
+
+function uid(){ return 'c'+Date.now()+Math.floor(Math.random()*1000); }
+
+function defaultData(){
+  return {
+    siteName: "Solved By SOHAG",
+    credentials: { username: "admin", password: "admin123" },
+    cards: [
+      {id:uid(), title:"Video Editing", icon:"🎨", color:SWATCHES[0], type:"html", content:"<h2>Video Editing</h2><p>এখানে আপনার ভিডিও এডিটিং টুল বা কনটেন্ট বসবে।</p>"},
+      {id:uid(), title:"Bangla Text Editor", icon:"🔤", color:SWATCHES[1], type:"html", content:"<h2>Bangla Text Editor</h2><p>এখানে বাংলা টেক্সট এডিটর বসবে।</p>"},
+      {id:uid(), title:"Audio Editor", icon:"🎵", color:SWATCHES[2], type:"html", content:"<h2>Audio Editor</h2><p>এখানে অডিও এডিটর বসবে।</p>"},
+      {id:uid(), title:"Video To Image Convert", icon:"🎬", color:SWATCHES[3], type:"html", content:"<h2>Video To Image Convert</h2><p>কনটেন্ট এখানে বসবে।</p>"},
+      {id:uid(), title:"Video Downloader", icon:"⬇️", color:SWATCHES[4], type:"html", content:"<h2>Video Downloader</h2><p>কনটেন্ট এখানে বসবে।</p>"},
+      {id:uid(), title:"Calculator", icon:"🧮", color:SWATCHES[5], type:"html", content:"<h2>Calculator</h2><p>কনটেন্ট এখানে বসবে।</p>"},
+      {id:uid(), title:"Birthday Calculator", icon:"🎂", color:SWATCHES[6], type:"html", content:"<h2>Birthday Calculator</h2><p>কনটেন্ট এখানে বসবে।</p>"},
+      {id:uid(), title:"Land Calculator", icon:"📐", color:SWATCHES[7], type:"html", content:"<h2>Land Calculator</h2><p>কনটেন্ট এখানে বসবে।</p>"},
+      {id:uid(), title:"All Calculator", icon:"📱", color:SWATCHES[8], type:"html", content:"<h2>All Calculator</h2><p>কনটেন্ট এখানে বসবে।</p>"}
+    ]
+  };
+}
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      DATA = JSON.parse(raw);
+    } else {
+      DATA = defaultData();
+      saveData();
+    }
+  }catch(e){
+    DATA = defaultData();
+  }
+  renderApp();
+}
+
+function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+  }catch(e){
+    console.error('Save failed', e);
+    alert('সেভ করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।');
+  }
+}
+
+function renderApp(){
+  if(isAdmin){ renderAdmin(); } else { renderPublic(); }
+}
+
+function renderPublic(searchTerm){
+  searchTerm = (searchTerm||'').toLowerCase();
+  const cards = DATA.cards.filter(c => c.title.toLowerCase().includes(searchTerm));
+  const cardsHtml = cards.length ? cards.map(c => `
+    <div class="card" onclick="openCard('${c.id}')">
+      <div class="icon-box" style="background:${c.color}">${c.icon||'⭐'}</div>
+      <div class="card-title">${escapeHtml(c.title)}</div>
+    </div>
+  `).join('') : `<div class="empty-note" style="grid-column:1/-1">কোনো অপশন পাওয়া যায়নি।</div>`;
+
+  document.getElementById('app').innerHTML = `
+    <header>
+      <div class="brand"><span class="solved">Solved By</span> <span class="name">SOHAG</span></div>
+      <nav>
+        <a href="#" onclick="renderPublic();return false;">Home</a>
+        <a href="#" onclick="renderPublic();return false;">All Apps</a>
+        <a href="#">Contact Us</a>
+      </nav>
+      <div class="header-right">
+        <div class="search-wrap">
+          <input id="searchBox" type="text" placeholder="Search..." value="${searchTerm?escapeHtml(searchTerm):''}" oninput="renderPublic(this.value)">
+          <button onclick="renderPublic(document.getElementById('searchBox').value)">Go</button>
+        </div>
+        <button class="dash-btn" onclick="openLogin()">My Dashboard</button>
+      </div>
+    </header>
+    <main>
+      <div class="grid">${cardsHtml}</div>
+    </main>
+    <footer>All Copyright Reserved By <b>${escapeHtml(DATA.siteName)}</b></footer>
+  `;
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.innerText = s;
+  return d.innerHTML;
+}
+
+/* ---------- Card viewer ---------- */
+function openCard(id){
+  const c = DATA.cards.find(x=>x.id===id);
+  if(!c) return;
+  if(c.type==='link'){
+    if(c.content) window.open(c.content, '_blank');
+    return;
+  }
+  document.getElementById('viewerTitle').innerText = c.title;
+  const body = document.getElementById('viewerBody');
+  if(c.type==='image'){
+    body.innerHTML = `<img class="viewer-img" src="${escapeHtml(c.content)}" alt="${escapeHtml(c.title)}">`;
+  } else if(c.type==='html'){
+    body.innerHTML = `<iframe class="viewer-frame" sandbox="allow-scripts allow-same-origin allow-popups" srcdoc="${escapeHtml(c.content)}"></iframe>`;
+  } else {
+    body.innerHTML = `<p>কোনো কনটেন্ট সেট করা হয়নি।</p>`;
+  }
+  document.getElementById('viewerOverlay').classList.add('show');
+}
+function closeViewer(){ document.getElementById('viewerOverlay').classList.remove('show'); }
+
+/* ---------- Login ---------- */
+function openLogin(){
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').innerText='';
+  document.getElementById('loginOverlay').classList.add('show');
+}
+function closeLogin(){ document.getElementById('loginOverlay').classList.remove('show'); }
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(u===DATA.credentials.username && p===DATA.credentials.password){
+    isAdmin = true;
+    closeLogin();
+    renderApp();
+  } else {
+    document.getElementById('loginErr').innerText = 'ভুল ইউজারনেম অথবা পাসওয়ার্ড।';
+  }
+}
+
+/* ---------- Admin panel ---------- */
+function renderAdmin(){
+  const itemsHtml = DATA.cards.map(c => `
+    <div class="admin-item">
+      <div class="icon-box" style="background:${c.color}">${c.icon||'⭐'}</div>
+      <div class="meta">
+        <div class="t">${escapeHtml(c.title)}</div>
+        <div class="s">Type: ${c.type}</div>
+      </div>
+      <div class="btns">
+        <button class="btn small secondary" onclick="editCard('${c.id}')">Edit</button>
+        <button class="btn small danger" onclick="deleteCard('${c.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('') || `<div class="empty-note">এখনো কোনো অপশন নেই।</div>`;
+
+  document.getElementById('app').innerHTML = `
+    <div class="admin-bar">
+      <div class="title">⚙️ Admin Panel — ${escapeHtml(DATA.siteName)}</div>
+      <div class="actions">
+        <button class="btn secondary" onclick="isAdmin=false;renderApp();">🌐 View Site</button>
+        <button class="btn danger" onclick="isAdmin=false;renderApp();">Logout</button>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div class="section-title">সাইট সেটিংস</div>
+      <div class="settings-card">
+        <div class="field">
+          <label>সাইটের নাম</label>
+          <input id="siteNameInput" type="text" value="${escapeHtml(DATA.siteName)}">
+        </div>
+        <button class="btn small" onclick="updateSiteName()">Save Name</button>
+        <hr style="margin:18px 0;border:none;border-top:1px solid var(--border)">
+        <div class="field">
+          <label>নতুন Username</label>
+          <input id="newUser" type="text" placeholder="${escapeHtml(DATA.credentials.username)}">
+        </div>
+        <div class="field">
+          <label>নতুন Password</label>
+          <input id="newPass" type="text" placeholder="নতুন পাসওয়ার্ড">
+        </div>
+        <button class="btn small" onclick="updateCredentials()">Update Login Info</button>
+        <div class="err" id="credErr"></div>
+      </div>
+
+      <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>অপশন সমূহ (${DATA.cards.length})</span>
+        <button class="btn small" onclick="openCardModal()">+ নতুন অপশন যোগ করুন</button>
+      </div>
+      <div class="admin-list">${itemsHtml}</div>
+    </div>
+  `;
+}
+
+async function updateSiteName(){
+  const v = document.getElementById('siteNameInput').value.trim();
+  if(!v) return;
+  DATA.siteName = v;
+  await saveData();
+  renderAdmin();
+}
+
+async function updateCredentials(){
+  const u = document.getElementById('newUser').value.trim();
+  const p = document.getElementById('newPass').value;
+  if(!u && !p){ document.getElementById('credErr').innerText='কমপক্ষে একটি ফিল্ড পূরণ করুন।'; return; }
+  if(u) DATA.credentials.username = u;
+  if(p) DATA.credentials.password = p;
+  await saveData();
+  document.getElementById('credErr').style.color = 'var(--green)';
+  document.getElementById('credErr').innerText = 'আপডেট হয়েছে ✔';
+}
+
+/* ---------- Card add/edit modal ---------- */
+function openCardModal(){
+  editingId = null;
+  document.getElementById('cardModalTitle').innerText = 'নতুন অপশন যোগ করুন';
+  document.getElementById('cf_title').value = '';
+  document.getElementById('cf_icon').value = '⭐';
+  document.getElementById('cf_type').value = 'link';
+  document.getElementById('cf_content_input').value = '';
+  document.getElementById('cf_content_textarea').value = '';
+  document.getElementById('cardErr').innerText='';
+  buildSwatches(SWATCHES[0]);
+  renderContentField();
+  document.getElementById('cardOverlay').classList.add('show');
+}
+function editCard(id){
+  const c = DATA.cards.find(x=>x.id===id);
+  if(!c) return;
+  editingId = id;
+  document.getElementById('cardModalTitle').innerText = 'অপশন এডিট করুন';
+  document.getElementById('cf_title').value = c.title;
+  document.getElementById('cf_icon').value = c.icon;
+  document.getElementById('cf_type').value = c.type;
+  document.getElementById('cardErr').innerText='';
+  buildSwatches(c.color);
+  renderContentField();
+  if(c.type==='html'){
+    document.getElementById('cf_content_textarea').value = c.content;
+  } else {
+    document.getElementById('cf_content_input').value = c.content;
+  }
+  document.getElementById('cardOverlay').classList.add('show');
+}
+function closeCardModal(){ document.getElementById('cardOverlay').classList.remove('show'); }
+
+function buildSwatches(selected){
+  const wrap = document.getElementById('cf_swatches');
+  wrap.innerHTML = SWATCHES.map(s => `<div class="swatch ${s===selected?'selected':''}" style="background:${s}" data-color="${s}" onclick="selectSwatch('${s}')"></div>`).join('');
+  wrap.dataset.selected = selected;
+}
+function selectSwatch(s){
+  document.querySelectorAll('.swatch').forEach(el=>el.classList.toggle('selected', el.dataset.color===s));
+  document.getElementById('cf_swatches').dataset.selected = s;
+}
+
+function renderContentField(){
+  const type = document.getElementById('cf_type').value;
+  const label = document.getElementById('cf_content_label');
+  const input = document.getElementById('cf_content_input');
+  const textarea = document.getElementById('cf_content_textarea');
+  if(type==='html'){
+    label.innerText = 'HTML কোড / টেক্সট';
+    input.style.display='none';
+    textarea.style.display='block';
+  } else {
+    label.innerText = type==='link' ? 'লিংক (URL)' : 'ইমেজ লিংক (URL)';
+    input.placeholder = type==='link' ? 'https://example.com' : 'https://example.com/image.jpg';
+    input.style.display='block';
+    textarea.style.display='none';
+  }
+}
+
+async function saveCard(){
+  const title = document.getElementById('cf_title').value.trim();
+  const icon = document.getElementById('cf_icon').value.trim() || '⭐';
+  const type = document.getElementById('cf_type').value;
+  const color = document.getElementById('cf_swatches').dataset.selected || SWATCHES[0];
+  const content = type==='html'
+    ? document.getElementById('cf_content_textarea').value
+    : document.getElementById('cf_content_input').value.trim();
+
+  if(!title){ document.getElementById('cardErr').innerText='টাইটেল দিন।'; return; }
+  if(!content){ document.getElementById('cardErr').innerText='কনটেন্ট / লিংক দিন।'; return; }
+
+  if(editingId){
+    const c = DATA.cards.find(x=>x.id===editingId);
+    Object.assign(c, {title, icon, type, color, content});
+  } else {
+    DATA.cards.push({id:uid(), title, icon, type, color, content});
+  }
+  await saveData();
+  closeCardModal();
+  renderAdmin();
+}
+
+async function deleteCard(id){
+  if(!confirm('আপনি কি নিশ্চিত এই অপশনটি ডিলিট করতে চান?')) return;
+  DATA.cards = DATA.cards.filter(c=>c.id!==id);
+  await saveData();
+  renderAdmin();
+}
+
+loadData();
+</script>
+</body>
+</html>
