@@ -413,7 +413,8 @@ function openCard(id){
   if(c.type==='image'){
     body.innerHTML = `<img class="viewer-img" src="${escapeHtml(c.content)}" alt="${escapeHtml(c.title)}">`;
   } else if(c.type==='html'){
-    body.innerHTML = `<iframe class="viewer-frame" sandbox="allow-scripts allow-same-origin allow-popups" srcdoc="${escapeHtml(c.content)}"></iframe>`;
+    body.innerHTML = `<iframe class="viewer-frame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>`;
+    body.querySelector('iframe').srcdoc = c.content;
   } else {
     body.innerHTML = `<p>কোনো কনটেন্ট সেট করা হয়নি।</p>`;
   }
