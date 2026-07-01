@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solved By SOHAG</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --green:#0f7a3d;
@@ -312,28 +314,42 @@ function defaultData(){
   };
 }
 
+const firebaseConfig = {
+  apiKey: "AIzaSyBGJSVJsD_dwwW5BrXRAs2jhLpMCM-NLKQ",
+  authDomain: "solvedbysohag.firebaseapp.com",
+  projectId: "solvedbysohag",
+  storageBucket: "solvedbysohag.firebasestorage.app",
+  messagingSenderId: "759669995655",
+  appId: "1:759669995655:web:044f67ce3ba8dbd8c16022",
+  measurementId: "G-J3J3R7N8Q6"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const SITE_DOC = db.collection('site').doc('data');
+
 function loadData(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      DATA = JSON.parse(raw);
+  document.getElementById('app').innerHTML = '<div style="text-align:center;padding:80px 20px;color:#7a8994">লোড হচ্ছে...</div>';
+  SITE_DOC.get().then(function(doc){
+    if(doc.exists){
+      DATA = doc.data();
     } else {
       DATA = defaultData();
       saveData();
     }
-  }catch(e){
+    renderApp();
+  }).catch(function(err){
+    console.error('Load failed', err);
     DATA = defaultData();
-  }
-  renderApp();
+    renderApp();
+    alert('ডেটা লোড করতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করুন।');
+  });
 }
 
 function saveData(){
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
-  }catch(e){
-    console.error('Save failed', e);
+  return SITE_DOC.set(DATA).catch(function(err){
+    console.error('Save failed', err);
     alert('সেভ করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।');
-  }
+  });
 }
 
 function renderApp(){
