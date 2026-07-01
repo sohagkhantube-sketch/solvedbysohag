@@ -277,6 +277,11 @@
       <label id="cf_content_label">লিংক (URL)</label>
       <input id="cf_content_input" type="text" placeholder="https://example.com">
       <textarea id="cf_content_textarea" style="display:none" placeholder="&lt;h1&gt;Hello&lt;/h1&gt;"></textarea>
+      <div id="cf_html_upload_wrap" style="display:none;margin-top:8px">
+        <label style="font-weight:600;font-size:12px;color:#5f6368">অথবা একটা .html ফাইল আপলোড করুন</label>
+        <input id="cf_html_file" type="file" accept=".html,.htm,text/html" style="margin-top:4px">
+        <div class="hint" id="cf_html_filename"></div>
+      </div>
     </div>
     <div class="err" id="cardErr"></div>
     <div class="btn-row">
@@ -518,6 +523,8 @@ function openCardModal(){
   document.getElementById('cf_type').value = 'link';
   document.getElementById('cf_content_input').value = '';
   document.getElementById('cf_content_textarea').value = '';
+  document.getElementById('cf_html_file').value = '';
+  document.getElementById('cf_html_filename').innerText = '';
   document.getElementById('cardErr').innerText='';
   buildSwatches(SWATCHES[0]);
   renderContentField();
@@ -532,6 +539,8 @@ function editCard(id){
   document.getElementById('cf_icon').value = c.icon;
   document.getElementById('cf_type').value = c.type;
   document.getElementById('cardErr').innerText='';
+  document.getElementById('cf_html_file').value = '';
+  document.getElementById('cf_html_filename').innerText = '';
   buildSwatches(c.color);
   renderContentField();
   if(c.type==='html'){
@@ -558,17 +567,40 @@ function renderContentField(){
   const label = document.getElementById('cf_content_label');
   const input = document.getElementById('cf_content_input');
   const textarea = document.getElementById('cf_content_textarea');
+  const uploadWrap = document.getElementById('cf_html_upload_wrap');
   if(type==='html'){
-    label.innerText = 'HTML কোড / টেক্সট';
+    label.innerText = 'HTML কোড / টেক্সট (অথবা নিচ থেকে ফাইল আপলোড করুন)';
     input.style.display='none';
     textarea.style.display='block';
+    uploadWrap.style.display='block';
   } else {
     label.innerText = type==='link' ? 'লিংক (URL)' : 'ইমেজ লিংক (URL)';
     input.placeholder = type==='link' ? 'https://example.com' : 'https://example.com/image.jpg';
     input.style.display='block';
     textarea.style.display='none';
+    uploadWrap.style.display='none';
   }
 }
+
+function initHtmlFileInput(){
+  const fileInput = document.getElementById('cf_html_file');
+  if(!fileInput || fileInput.dataset.bound) return;
+  fileInput.dataset.bound = '1';
+  fileInput.addEventListener('change', function(){
+    const file = fileInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+      document.getElementById('cf_content_textarea').value = e.target.result;
+      document.getElementById('cf_html_filename').innerText = '✔ লোড হয়েছে: ' + file.name;
+    };
+    reader.onerror = function(){
+      document.getElementById('cardErr').innerText = 'ফাইল পড়তে সমস্যা হয়েছে।';
+    };
+    reader.readAsText(file);
+  });
+}
+initHtmlFileInput();
 
 async function saveCard(){
   const title = document.getElementById('cf_title').value.trim();
@@ -580,7 +612,7 @@ async function saveCard(){
     : document.getElementById('cf_content_input').value.trim();
 
   if(!title){ document.getElementById('cardErr').innerText='টাইটেল দিন।'; return; }
-  if(!content){ document.getElementById('cardErr').innerText='কনটেন্ট / লিংক দিন।'; return; }
+  if(!content){ document.getElementById('cardErr').innerText='কনটেন্ট / লিংক / ফাইল দিন।'; return; }
 
   if(editingId){
     const c = DATA.cards.find(x=>x.id===editingId);
